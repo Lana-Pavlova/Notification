@@ -183,9 +183,9 @@ class MainActivity : AppCompatActivity() {
 
             val names = birthdays[selectedDate]
             val message = if (names != null) {
-                "Сегодня день рождения: ${names.joinToString(", ")}"
+                "${selectedDate} день рождения: ${names.joinToString(", ")}"
             } else {
-                "Сегодня нет ни одного дня рождения."
+                "${selectedDate} нет ни одного дня рождения."
             }
 
             showNotification("Напоминание о дне рождения", message)
