@@ -14,6 +14,7 @@ import androidx.core.app.NotificationManagerCompat
 import android.Manifest
 import android.app.PendingIntent
 import android.content.Intent
+import android.net.Uri
 
 class MainActivity : AppCompatActivity() {
     private lateinit var manager: NotificationManagerCompat
@@ -124,4 +125,46 @@ class MainActivity : AppCompatActivity() {
         manager.notify(R.id.GOOGLE_NOTIFICATION_ID, builder.build())
     }
 
+    fun complexNotification(view: View) {
+        val browser = Intent(Intent.ACTION_VIEW)
+        browser.setData(Uri.parse("https://gmir.ru/"))
+        val browsePI = PendingIntent.getActivity(
+            this,
+            R.id.BROWSER_PENDING_ID, browser, PendingIntent.FLAG_IMMUTABLE
+        )
+        val map = Intent(Intent.ACTION_VIEW)
+        map.setData(Uri.parse("geo: 59.931688, 30.301136"))
+        val mapPI = PendingIntent.getActivity(
+            this, R.id.MAP_PENDING_ID, map,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val builder = NotificationCompat.Builder(this, NORMAL_CHANNEL)
+        builder
+            .setSmallIcon(android.R.drawable.sym_def_app_icon)
+            .setContentTitle("Экскурсия")
+            .setContentText("Экскурсия начнётся через 5 минут")
+        builder.addAction(
+            NotificationCompat.Action(
+                android.R.drawable.btn_star,
+                "В браузере",
+                browsePI
+            )
+        )
+        builder.addAction(
+            NotificationCompat.Action(
+                android.R.drawable.btn_star,
+                "На карте",
+                mapPI
+            )
+        )
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        manager.notify(R.id.HISTORY_NOTIFICATION_ID, builder.build())
+    }
 }

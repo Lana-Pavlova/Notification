@@ -3,5 +3,7 @@
     <item name="SIMPLE_NOTIFICATION_ID" type="id"/>
     <item name="BROWSER_PENDING_ID" type="id"/>
     <item name="GOOGLE_NOTIFICATION_ID" type="id"/>
+    <item name="MAP_PENDING_ID" type="id"/>
+    <item name="HISTORY_NOTIFICATION_ID" type="id"/>
 
 </resources>

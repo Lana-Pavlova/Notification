@@ -30,5 +30,12 @@
         android:onClick="browserNotification"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+    <!--Сложное уведомление -->
+    <Button
+        android:id="@+id/complex"
+        android:text="Сложное уведомление"
+        android:onClick="complexNotification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 </LinearLayout>
 
