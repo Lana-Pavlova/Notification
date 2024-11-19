@@ -15,6 +15,10 @@ import android.Manifest
 import android.app.PendingIntent
 import android.content.Intent
 import android.net.Uri
+import android.widget.CalendarView
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var manager: NotificationManagerCompat
@@ -43,6 +47,8 @@ class MainActivity : AppCompatActivity() {
             channel.enableVibration(false)
             manager.createNotificationChannel(channel)
         }
+        setupCalendarListener()
+
     }
 
     fun simpleNotification(view: View) {
@@ -62,14 +68,6 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //    public void onRequestPermissionsResult(int requestCode, String[l permissions,
-            //    int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.POST_NOTIFICATIONS),
@@ -91,9 +89,6 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Разрешение получено, теперь можно отправить уведомление
                 simpleNotification(View(this))
-            } else {
-                // Разрешение не получено, обработайте это соответствующим образом
-                // Например, покажите пользователю сообщение о том, что разрешение необходимо
             }
         }
     }
@@ -166,5 +161,57 @@ class MainActivity : AppCompatActivity() {
             return
         }
         manager.notify(R.id.HISTORY_NOTIFICATION_ID, builder.build())
+    }
+
+    // Календарь
+    // Карта, где ключ - это дата рождения, а значение - список имен
+    private val birthdays = mapOf(
+        "09-03-2024" to listOf("Лана Павлова", "Алёна Иванова"),
+        "17-05-2024" to listOf("Варвара Петрова"),
+        "23-11-2024" to listOf("Ксения Таможенникова"),
+        "24-11-2024" to listOf("Ольга Славникова", "Дарья Журавлёва")
+    )
+
+    private fun setupCalendarListener() {
+        val calendarView = findViewById<CalendarView>(R.id.calendarView)
+
+        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+            val calendar = Calendar.getInstance()
+            calendar.set(year, month, dayOfMonth)
+            val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+            val selectedDate = sdf.format(calendar.time)
+
+            val names = birthdays[selectedDate]
+            val message = if (names != null) {
+                "Сегодня день рождения: ${names.joinToString(", ")}"
+            } else {
+                "Сегодня нет ни одного дня рождения."
+            }
+
+            showNotification("Напоминание о дне рождения", message)
+        }
+    }
+
+    private fun showNotification(title: String, message: String) {
+        val channelId = "birthday_reminder_channel"
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Birthday Reminder Channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.cake)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
+
+        notificationManager.notify(1, notification)
     }
 }
